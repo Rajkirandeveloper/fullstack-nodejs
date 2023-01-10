@@ -1,4 +1,5 @@
 const express=require('express');
+const mongodb=require('mongodb').MongoClient;
 
 const categoryRoute=express.Router();
 const category=[
@@ -26,7 +27,22 @@ const category=[
 
 
 categoryRoute.get('/',(req,res)=>{
-   res.render('category',{title:"This is Category page",data:category})
+    mongodb.connect(" mongodb://127.0.0.1:27017/?compressors=disabled&gssapiServiceName=mongodb",function(err,dc){
+        if(err){
+            console.log(err)
+        }else{
+            let dbObj=dc.db('fullstack')
+            dbObj.collection('category').find().toArray(function(err,data){
+                if(err){
+                    console.log(err)
+                }else{
+                    res.render('category',{title:"This is Category page",data:category})
+                    
+                }
+            })
+        }
+    })
+   
 })
 
 module.exports=categoryRoute
